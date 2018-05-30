@@ -49,7 +49,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MovieViewHolder> {
         holder.posterImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "" + position + movie.getOriginalTitle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, position + " \nUnique Id " + movie.getId()
+                        + " \n" + movie.getOriginalTitle()
+                        + " \n" + movie.getOverview()
+                        + " \n" + movie.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
 

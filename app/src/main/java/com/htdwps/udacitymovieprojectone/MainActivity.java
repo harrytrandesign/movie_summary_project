@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
@@ -23,7 +25,9 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final static String MOVIEDB_BASE_URL = "http://api.themoviedb.org/3/";
+    public static final String MOVIEDB_BASE_URL = "http://api.themoviedb.org/3/";
+    public static final String POPULAR_CALL_TAG = "popular";
+    public static final String TOPRATED_CALL_TAG = "toprated";
 
     private RecyclerView recyclerView;
     private MoviesAdapter moviesAdapter;
@@ -31,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Get JSON
     public Retrofit retrofit = null;
+
+    // For Testing Purposes
+    Button tempbutton;
+    public boolean popular = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupLayout();
 
-        loadJsonData();
+        loadInitialJsonData();
 
     }
 
@@ -56,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         return retrofit;
     }
 
-    public void loadJsonData() {
+    public void loadInitialJsonData() {
         try {
             if (BuildConfig.MOVIE_DB_API_KEY_TOKEN.isEmpty()) {
                 Toast.makeText(this, "Your API Key is empty.", Toast.LENGTH_SHORT).show();
@@ -93,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void setupLayout() {
+        tempbutton = findViewById(R.id.test_click_button);
+        tempbutton.setText("See Top-Rated Movies");
+        tempbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swapToggleRetrievedList();
+            }
+        });
         recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
         movieList = new ArrayList<>();
         moviesAdapter = new MoviesAdapter(this, movieList);
@@ -101,7 +117,53 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.hasFixedSize();
         recyclerView.setAdapter(moviesAdapter);
-        moviesAdapter.notifyDataSetChanged();
+//        moviesAdapter.notifyDataSetChanged();
 
     }
+
+    public void swapToggleRetrievedList() {
+        try {
+            if (BuildConfig.MOVIE_DB_API_KEY_TOKEN.isEmpty()) {
+                Toast.makeText(this, "Your API Key is empty.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            MovieApiService movieApiService = getClient().create(MovieApiService.class);
+
+            Call<MovieResponse> call;
+            if (popular) {
+                popular = false;
+                tempbutton.setText("See Popular Movies");
+                call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
+            } else {
+                popular = true;
+                tempbutton.setText("See Top-Rated Movies");
+                call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
+            }
+
+            call.enqueue(new Callback<MovieResponse>() {
+                @Override
+                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+
+                    Timber.i("Response successful");
+                    Timber.i(response.body().getPage().toString());
+
+//                    MovieResponse movieResponse = response.body();
+                    List<Result> movies = response.body().getResults();
+                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+//                    moviesAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFailure(Call<MovieResponse> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "Failed to retrieve data.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            Timber.i(e.getMessage());
+        }
+    }
+
+
 }
