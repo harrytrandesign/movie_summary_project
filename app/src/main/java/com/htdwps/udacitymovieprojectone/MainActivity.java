@@ -62,38 +62,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void loadInitialJsonData() {
-        try {
-            MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
-
-            // Movie DB Api key stored in the gradle.properties file
-            Call<MovieResponse> call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
-
-            call.enqueue(new Callback<MovieResponse>() {
-                @Override
-                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-
-                    Timber.i("Response successful");
-                    Timber.i(response.body().getPage().toString());
-
-//                    MovieResponse movieResponse = response.body();
-                    List<Result> movies = response.body().getResults();
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-//                    moviesAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onFailure(Call<MovieResponse> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "Failed to retrieve data.", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        } catch (Exception e) {
-            Timber.i(e);
-        }
-    }
-
-
     public void setupLayout() {
         spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
         spinnerMoviePicker.setOnItemSelectedListener(this);
