@@ -5,10 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
+import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
 import com.htdwps.udacitymovieprojectone.model.MovieResponse;
 import com.htdwps.udacitymovieprojectone.model.Result;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
@@ -20,12 +23,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public static final String MOVIEDB_BASE_URL = "http://api.themoviedb.org/3/";
     public static final String POPULAR_CALL_TAG = "popular";
     public static final String TOPRATED_CALL_TAG = "toprated";
 
@@ -33,11 +34,15 @@ public class MainActivity extends AppCompatActivity {
     private MoviesAdapter moviesAdapter;
     private List<Result> movieList;
 
+    // Menu for swapping between popular and top rated
+    private ArrayAdapter<String> spinnerAdapter;
+    private String[] spinnerSelection;
+    private Spinner spinnerMoviePicker;
+
     // Get JSON
     public Retrofit retrofit = null;
 
     // For Testing Purposes
-    Button tempbutton;
     public boolean popular = true;
 
     @Override
@@ -49,30 +54,19 @@ public class MainActivity extends AppCompatActivity {
 
         setupLayout();
 
-        loadInitialJsonData();
+        spinnerSelection = this.getResources().getStringArray(R.array.movie_selection);
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, spinnerSelection);
+        spinnerMoviePicker.setAdapter(spinnerAdapter);
 
-    }
+        swapToggleRetrievedList();
 
-
-    public Retrofit getClient() {
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(MOVIEDB_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-        }
-        return retrofit;
     }
 
     public void loadInitialJsonData() {
         try {
-            if (BuildConfig.MOVIE_DB_API_KEY_TOKEN.isEmpty()) {
-                Toast.makeText(this, "Your API Key is empty.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
 
-            MovieApiService movieApiService = getClient().create(MovieApiService.class);
-
+            // Movie DB Api key stored in the gradle.properties file
             Call<MovieResponse> call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
 
             call.enqueue(new Callback<MovieResponse>() {
@@ -95,20 +89,14 @@ public class MainActivity extends AppCompatActivity {
             });
 
         } catch (Exception e) {
-            Timber.i(e.getMessage());
+            Timber.i(e);
         }
     }
 
 
     public void setupLayout() {
-        tempbutton = findViewById(R.id.test_click_button);
-        tempbutton.setText("See Top-Rated Movies");
-        tempbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                swapToggleRetrievedList();
-            }
-        });
+        spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
+        spinnerMoviePicker.setOnItemSelectedListener(this);
         recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
         movieList = new ArrayList<>();
         moviesAdapter = new MoviesAdapter(this, movieList);
@@ -117,41 +105,36 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.hasFixedSize();
         recyclerView.setAdapter(moviesAdapter);
-//        moviesAdapter.notifyDataSetChanged();
 
     }
 
     public void swapToggleRetrievedList() {
         try {
-            if (BuildConfig.MOVIE_DB_API_KEY_TOKEN.isEmpty()) {
-                Toast.makeText(this, "Your API Key is empty.", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
-            MovieApiService movieApiService = getClient().create(MovieApiService.class);
+            MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
 
             Call<MovieResponse> call;
             if (popular) {
-                popular = false;
-                tempbutton.setText("See Popular Movies");
-                call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
-            } else {
-                popular = true;
-                tempbutton.setText("See Top-Rated Movies");
                 call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
+            } else {
+                call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
             }
 
             call.enqueue(new Callback<MovieResponse>() {
                 @Override
                 public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
 
-                    Timber.i("Response successful");
-                    Timber.i(response.body().getPage().toString());
+//                    Timber.i("Response successful");
+//                    Timber.i(response.body().getPage().toString());
 
 //                    MovieResponse movieResponse = response.body();
-                    List<Result> movies = response.body().getResults();
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                    try {
+                        List<Result> movies = response.body().getResults();
+                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
 //                    moviesAdapter.notifyDataSetChanged();
+                    } catch (NullPointerException e) {
+                        Timber.i(e);
+                    }
                 }
 
                 @Override
@@ -161,9 +144,42 @@ public class MainActivity extends AppCompatActivity {
             });
 
         } catch (Exception e) {
-            Timber.i(e.getMessage());
+            Timber.i(e);
         }
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+        switch (i) {
+            case 0:
+
+                popular = true;
+                swapToggleRetrievedList();
+
+                break;
+
+            case 1:
+
+                popular = false;
+                swapToggleRetrievedList();
+
+                break;
+
+            default:
+
+                popular = true;
+                swapToggleRetrievedList();
+
+                break;
+
+        }
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 }
