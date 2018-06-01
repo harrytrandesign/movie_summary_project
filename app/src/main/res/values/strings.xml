@@ -5,4 +5,5 @@
 
     <string name="spinner_label_popular">Popular Movies</string>
     <string name="spinner_label_toprated">Top-Rated Movies</string>
+    <string name="text_label_movie_poster">The release poster for this movie.</string>
 </resources>

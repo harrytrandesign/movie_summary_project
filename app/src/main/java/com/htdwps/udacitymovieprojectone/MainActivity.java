@@ -19,6 +19,7 @@ import com.htdwps.udacitymovieprojectone.util.MovieApiService;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,17 +28,18 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private RecyclerView recyclerView;
+    private Spinner spinnerMoviePicker;
+
     public static final String POPULAR_CALL_TAG = "popular";
     public static final String TOPRATED_CALL_TAG = "toprated";
 
-    private RecyclerView recyclerView;
     private MoviesAdapter moviesAdapter;
     private List<Result> movieList;
 
     // Menu for swapping between popular and top rated
     private ArrayAdapter<String> spinnerAdapter;
     private String[] spinnerSelection;
-    private Spinner spinnerMoviePicker;
 
     // Get JSON
     public Retrofit retrofit = null;
@@ -51,11 +53,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         Timber.plant();
+        ButterKnife.bind(this);
 
-        setupLayout();
+//        setupLayout();
+        movieList = new ArrayList<>();
+        moviesAdapter = new MoviesAdapter(this, movieList);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.hasFixedSize();
+        recyclerView.setAdapter(moviesAdapter);
 
         spinnerSelection = this.getResources().getStringArray(R.array.movie_selection);
         spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, spinnerSelection);
+        spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
+        spinnerMoviePicker.setOnItemSelectedListener(this);
         spinnerMoviePicker.setAdapter(spinnerAdapter);
 
         swapToggleRetrievedList();
@@ -63,16 +76,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void setupLayout() {
-        spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
-        spinnerMoviePicker.setOnItemSelectedListener(this);
-        recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
-        movieList = new ArrayList<>();
-        moviesAdapter = new MoviesAdapter(this, movieList);
+//        spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
+//        recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.hasFixedSize();
-        recyclerView.setAdapter(moviesAdapter);
 
     }
 
