@@ -1,5 +1,6 @@
 package com.htdwps.udacitymovieprojectone;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -57,7 +58,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        setupLayout();
         movieList = new ArrayList<>();
-        moviesAdapter = new MoviesAdapter(this, movieList);
+        moviesAdapter = new MoviesAdapter(this, movieList, new MoviesAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Result movie) {
+
+                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+
+                Bundle detailBundle = new Bundle();
+
+                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
+                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
+                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
+                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
+                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
+                detailIntent.putExtras(detailBundle);
+
+                startActivity(detailIntent);
+
+            }
+        });
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
@@ -104,7 +123,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                    MovieResponse movieResponse = response.body();
                     try {
                         List<Result> movies = response.body().getResults();
-                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies, new MoviesAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(Result movie) {
+                                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                                Bundle detailBundle = new Bundle();
+                                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
+                                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
+                                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
+                                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
+                                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
+                                detailIntent.putExtras(detailBundle);
+                                startActivity(detailIntent);
+
+                            }
+                        }));
 //                    moviesAdapter.notifyDataSetChanged();
                     } catch (NullPointerException e) {
                         Timber.i(e);
