@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 Bundle detailBundle = new Bundle();
 
+                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
                 detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
                 detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
                 detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             public void onItemClick(Result movie) {
                                 Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
                                 Bundle detailBundle = new Bundle();
+                                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
                                 detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
                                 detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
                                 detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());

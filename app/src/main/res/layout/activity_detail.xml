@@ -13,19 +13,42 @@
         android:orientation="vertical"
         android:padding="@dimen/padding_small">
 
-        <ImageView
-            android:id="@+id/iv_movie_poster"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/text_label_movie_poster"
-            android:scaleType="fitCenter"/>
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_movie_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_xsmall"/>
+            <ImageView
+                android:id="@+id/iv_movie_poster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/text_label_movie_poster"
+                android:scaleType="fitCenter"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/scrim_practice"/>
+
+            <TextView
+                android:id="@+id/tv_movie_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:fontFamily="sans-serif-black"
+                android:padding="@dimen/padding_small"
+                android:textColor="@color/white"
+                android:textSize="24sp"/>
+
+        </FrameLayout>
+
+        <!-- Just for testing and practice purposes -->
+        <!--<com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView-->
+            <!--android:id="@+id/iv_two_third_image_poster"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:scaleType="centerCrop"/>-->
+
 
         <TextView
             android:id="@+id/tv_movie_release_date"
