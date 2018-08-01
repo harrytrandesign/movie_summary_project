@@ -4,11 +4,10 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.R;
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
-import com.htdwps.udacitymovieprojectone.model.Result;
+import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -28,13 +27,13 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
 //            public void onClick(View view) {
 //                int position = getAdapterPosition();
 //                if (position != RecyclerView.NO_POSITION) {
-////                    Result clickedItem = movieList
+////                    MovieDetail clickedItem = movieList
 //                }
 //            }
 //        });
     }
 
-    public void bind(final Context context, final Result movie, final MoviesAdapter.OnItemClickListener listener) {
+    public void bind(final Context context, final MovieDetail movie, final MoviesAdapter.OnItemClickListener listener) {
 
         Picasso.with(context)
                 .load(movie.getPosterPath())
@@ -45,7 +44,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 listener.onItemClick(movie);
-                Toast.makeText(context, "Only see this if it works as it should work", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Only see this if it works as it should work", Toast.LENGTH_SHORT).show();
             }
         });
         //        holder.posterImageView.setOnClickListener(new View.OnClickListener() {

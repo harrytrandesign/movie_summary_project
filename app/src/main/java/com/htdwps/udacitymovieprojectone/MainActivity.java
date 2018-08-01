@@ -13,8 +13,8 @@ import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
+import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.MovieResponse;
-import com.htdwps.udacitymovieprojectone.model.Result;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
 
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import timber.log.Timber;
 
+import static com.htdwps.udacitymovieprojectone.util.StringConstantsUtil.MOVIE_OBJECT_KEY;
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private RecyclerView recyclerView;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String TOPRATED_CALL_TAG = "toprated";
 
     private MoviesAdapter moviesAdapter;
-    private List<Result> movieList;
+    private List<MovieDetail> movieList;
 
     // Menu for swapping between popular and top rated
     private ArrayAdapter<String> spinnerAdapter;
@@ -60,21 +62,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         movieList = new ArrayList<>();
         moviesAdapter = new MoviesAdapter(this, movieList, new MoviesAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Result movie) {
+            public void onItemClick(MovieDetail movie) {
 
-                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                // I don't think this method is called at all when an item is clicked on the grid view
+//                Toast.makeText(MainActivity.this, movie.getId().toString(), Toast.LENGTH_SHORT).show();
 
-                Bundle detailBundle = new Bundle();
+//                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+//
+//                // Test using Parcelable to pass object from one activity to another
+//                MovieDetail result = movie;
+//
+//                detailIntent.putExtra(MOVIE_OBJECT_KEY, result);
+//                Bundle detailBundle = new Bundle();
+//
+//                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
+//                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
+//                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
+//                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
+//                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
+//                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
+//                detailIntent.putExtras(detailBundle);
 
-                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
-                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
-                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
-                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
-                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
-                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
-                detailIntent.putExtras(detailBundle);
-
-                startActivity(detailIntent);
+//                startActivity(detailIntent);
 
             }
         });
@@ -123,19 +132,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //                    MovieResponse movieResponse = response.body();
                     try {
-                        List<Result> movies = response.body().getResults();
+                        List<MovieDetail> movies = response.body().getMovieDetails();
                         recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies, new MoviesAdapter.OnItemClickListener() {
                             @Override
-                            public void onItemClick(Result movie) {
+                            public void onItemClick(MovieDetail movie) {
+
+//                                Toast.makeText(MainActivity.this, "From swap toggle " + movie.getOriginalTitle(), Toast.LENGTH_SHORT).show();
                                 Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
-                                Bundle detailBundle = new Bundle();
-                                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
-                                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
-                                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
-                                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
-                                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
-                                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
-                                detailIntent.putExtras(detailBundle);
+
+                                // This is where the parcelable is being passed
+                                detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+
+//                                Bundle detailBundle = new Bundle();
+//                                detailBundle.putString(MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
+//                                detailBundle.putString(MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
+//                                detailBundle.putString(MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
+//                                detailBundle.putString(MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
+//                                detailBundle.putString(MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
+//                                detailBundle.putString(MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
+//                                detailIntent.putExtras(detailBundle);
                                 startActivity(detailIntent);
 
                             }

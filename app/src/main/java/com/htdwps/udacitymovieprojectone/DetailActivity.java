@@ -7,22 +7,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView;
+import com.htdwps.udacitymovieprojectone.model.MovieDetail;
+import com.htdwps.udacitymovieprojectone.util.StringConstantsUtil;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class DetailActivity extends AppCompatActivity {
-
-    public static final String MOVIE_ID_STRING_KEY = "movie_id";
-    public static final String MOVIE_POSTER_STRING_KEY = "movie_poster";
-    public static final String MOVIE_TITLE_STRING_KEY = "movie_title";
-    public static final String MOVIE_RELEASE_STRING_KEY = "movie_release";
-    public static final String MOVIE_VOTE_STRING_KEY = "movie_rating";
-    public static final String MOVIE_SUMMARY_STRING_KEY = "movie_synopsis";
 
     // Test a 2/3 ratio imageview
     private TwoThirdsImageView ivTwoThirdsImageView;
@@ -58,14 +52,23 @@ public class DetailActivity extends AppCompatActivity {
     public void grabBundledExtras() {
         if (getIntent().getExtras() != null) {
 
-            Bundle bundle = getIntent().getExtras();
+//            Bundle bundle = getIntent().getExtras();
+//
+//            movieIdKey = bundle.getString(MOVIE_ID_STRING_KEY);
+//            moviePosterString = bundle.getString(MOVIE_POSTER_STRING_KEY);
+//            movieTitleString = bundle.getString(MOVIE_TITLE_STRING_KEY);
+//            movieReleaseDateString = bundle.getString(MOVIE_RELEASE_STRING_KEY);
+//            movieVoteAverageString = bundle.getString(MOVIE_VOTE_STRING_KEY);
+//            movieSynopsisString = bundle.getString(MOVIE_SUMMARY_STRING_KEY);
 
-            movieIdKey = bundle.getString(MOVIE_ID_STRING_KEY);
-            moviePosterString = bundle.getString(MOVIE_POSTER_STRING_KEY);
-            movieTitleString = bundle.getString(MOVIE_TITLE_STRING_KEY);
-            movieReleaseDateString = bundle.getString(MOVIE_RELEASE_STRING_KEY);
-            movieVoteAverageString = bundle.getString(MOVIE_VOTE_STRING_KEY);
-            movieSynopsisString = bundle.getString(MOVIE_SUMMARY_STRING_KEY);
+            MovieDetail movieMovieDetail = getIntent().getParcelableExtra(StringConstantsUtil.MOVIE_OBJECT_KEY);
+
+            movieIdKey = String.valueOf(movieMovieDetail.getId());
+            moviePosterString = movieMovieDetail.getPosterPath();
+            movieTitleString = movieMovieDetail.getOriginalTitle();
+            movieReleaseDateString = movieMovieDetail.getReleaseDate();
+            movieVoteAverageString = String.valueOf(movieMovieDetail.getVoteAverage());
+            movieSynopsisString = movieMovieDetail.getOverview();
 
             populateUiFields(moviePosterString, movieTitleString, movieReleaseDateString, movieVoteAverageString, movieSynopsisString);
 
@@ -113,7 +116,8 @@ public class DetailActivity extends AppCompatActivity {
             tvMovieSynopsis.setText(summary);
         }
 
-        Toast.makeText(this, movieIdKey, Toast.LENGTH_LONG).show();
+        // This toast pops up when detail activity opens up
+//        Toast.makeText(this, movieSynopsisString, Toast.LENGTH_LONG).show();
 
     }
 

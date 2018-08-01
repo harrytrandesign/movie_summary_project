@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.htdwps.udacitymovieprojectone.R;
-import com.htdwps.udacitymovieprojectone.model.Result;
+import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.viewholder.MovieViewHolder;
 
 import java.util.List;
@@ -18,15 +18,15 @@ import java.util.List;
 public class MoviesAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 
     private Context mContext;
-    private List<Result> mMovieList;
+    private List<MovieDetail> mMovieList;
     private LayoutInflater mInflater;
     private final OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(Result movie);
+        void onItemClick(MovieDetail movie);
     }
 
-    public MoviesAdapter(Context mContext, List<Result> movieList, OnItemClickListener listener) {
+    public MoviesAdapter(Context mContext, List<MovieDetail> movieList, OnItemClickListener listener) {
         this.mContext = mContext;
         this.mMovieList = movieList;
         this.mInflater = LayoutInflater.from(mContext);
@@ -47,7 +47,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MovieViewHolder> {
         movieViewHolder.bind(mContext, mMovieList.get(position), listener);
 //        MovieViewHolder.bind(mContext, mMovieList.get(position), listener);
 
-//        final Result movie = mMovieList.get(position);
+//        final MovieDetail movie = mMovieList.get(position);
 //
 //        Picasso.with(mContext)
 //                .load(movie.getPosterPath())
