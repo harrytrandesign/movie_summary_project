@@ -6,4 +6,6 @@
     <string name="spinner_label_popular">Popular Movies</string>
     <string name="spinner_label_toprated">Top-Rated Movies</string>
     <string name="text_label_movie_poster">The release poster for this movie.</string>
+    <string name="btn_text_click_me">Click Me</string>
+    <string name="reviews_label_textview">Reviews</string>
 </resources>

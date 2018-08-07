@@ -44,10 +44,10 @@
 
         <!-- Just for testing and practice purposes -->
         <!--<com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView-->
-            <!--android:id="@+id/iv_two_third_image_poster"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:scaleType="centerCrop"/>-->
+        <!--android:id="@+id/iv_two_third_image_poster"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:scaleType="centerCrop"/>-->
 
 
         <TextView
@@ -67,6 +67,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_xsmall"/>
+
+        <TextView
+            android:id="@+id/tv_reviews_label"
+            android:text="@string/reviews_label_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_movie_reviews_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layoutDirection="ltr"/>
 
     </LinearLayout>
 

@@ -2,6 +2,7 @@ package com.htdwps.udacitymovieprojectone.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -15,9 +16,9 @@ public class ReviewList {
     @SerializedName("page")
     @Expose
     private Integer page;
-    @SerializedName("movieDetails")
+    @SerializedName("results")
     @Expose
-    private List<MovieDetail> movieDetails = null;
+    private List<Reviews> results = null;
     @SerializedName("total_pages")
     @Expose
     private Integer totalPages;
@@ -41,12 +42,12 @@ public class ReviewList {
         this.page = page;
     }
 
-    public List<MovieDetail> getMovieDetails() {
-        return movieDetails;
+    public List<Reviews> getResults() {
+        return results;
     }
 
-    public void setMovieDetails(List<MovieDetail> movieDetails) {
-        this.movieDetails = movieDetails;
+    public void setResults(List<Reviews> results) {
+        this.results = results;
     }
 
     public Integer getTotalPages() {
