@@ -69,10 +69,32 @@
             android:padding="@dimen/padding_xsmall"/>
 
         <TextView
-            android:id="@+id/tv_reviews_label"
-            android:text="@string/reviews_label_textview"
+            android:id="@+id/tv_trailer_label"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:background="@color/colorAccent"
+            android:padding="@dimen/padding_small"
+            android:text="@string/trailer_label_textview"
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_movie_trailer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layoutDirection="ltr"/>
+
+        <TextView
+            android:id="@+id/tv_reviews_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_small"
+            android:background="@color/colorAccent"
+            android:padding="@dimen/padding_small"
+            android:text="@string/reviews_label_textview"
+            android:textColor="@color/white"
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_movie_reviews_list"

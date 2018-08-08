@@ -27,7 +27,6 @@ public class ReviewViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(final Context context, final Reviews reviews, final ReviewsAdapter.OnItemClickListener listener) {
 
-        // Do nothing for now
         authorTextView.setText(reviews.getAuthor());
         contentTextView.setText(reviews.getContent());
 

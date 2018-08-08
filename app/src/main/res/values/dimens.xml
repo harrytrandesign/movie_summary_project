@@ -2,6 +2,7 @@
 <resources>
     <dimen name="padding_xsmall">3dp</dimen>
     <dimen name="padding_small">6dp</dimen>
+    <dimen name="padding_medium">12dp</dimen>
     
     <dimen name="attribution_logo_size">30dp</dimen>
     <dimen name="image_height">360dp</dimen>

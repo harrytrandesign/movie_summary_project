@@ -1,8 +1,13 @@
 package com.htdwps.udacitymovieprojectone;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -12,6 +17,7 @@ import android.widget.TextView;
 
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
 import com.htdwps.udacitymovieprojectone.adapter.ReviewsAdapter;
+import com.htdwps.udacitymovieprojectone.adapter.TrailersAdapter;
 import com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.ReviewList;
@@ -44,6 +50,9 @@ public class DetailActivity extends AppCompatActivity {
     private TextView tvMovieVoteAverage;
     private TextView tvMovieSynopsis;
     private RecyclerView rvReviewsListing;
+    private TextView tvReviewLabel;
+    private RecyclerView rvTrailerListing;
+    private TextView tvTrailerLabel;
 
     String moviePosterString, movieTitleString, movieReleaseDateString, movieVoteAverageString, movieSynopsisString, movieIdKey;
 
@@ -71,12 +80,42 @@ public class DetailActivity extends AppCompatActivity {
         tvMovieReleaseDate = findViewById(R.id.tv_movie_release_date);
         tvMovieVoteAverage = findViewById(R.id.tv_movie_vote_average);
         tvMovieSynopsis = findViewById(R.id.tv_movie_synopsis);
+
+        tvTrailerLabel = findViewById(R.id.tv_trailer_label);
+        tvReviewLabel = findViewById(R.id.tv_reviews_label);
+
+        rvTrailerListing = findViewById(R.id.rv_movie_trailer_list);
+//        rvTrailerListing.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rvTrailerListing.setLayoutManager(new GridLayoutManager(this, 2));
+        rvTrailerListing.addItemDecoration(new DividerItemDecoration(rvTrailerListing.getContext(), DividerItemDecoration.VERTICAL));
+
         rvReviewsListing = findViewById(R.id.rv_movie_reviews_list);
         rvReviewsListing.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvReviewsListing.setAdapter(reviewsAdapter);
+//        rvReviewsListing.setAdapter(reviewsAdapter);
+        rvReviewsListing.addItemDecoration(new DividerItemDecoration(rvReviewsListing.getContext(), DividerItemDecoration.VERTICAL));
+
 
         grabBundledExtras();
 
+    }
+
+    public void watchYoutubeVideoTrailer(String video_id_key) {
+        Intent openAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + video_id_key));
+        Intent openWebIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + video_id_key));
+
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        openAppIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+
+        openWebIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        openWebIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        openWebIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+
+        try {
+            this.startActivity(openAppIntent);
+        } catch (ActivityNotFoundException error) {
+            this.startActivity(openWebIntent);
+        }
     }
 
     public void grabBundledExtras() {
@@ -124,6 +163,11 @@ public class DetailActivity extends AppCompatActivity {
                 try {
 
                     List<Reviews> reviews = response.body().getResults();
+
+                    if (reviews.size() < 1) {
+                        tvReviewLabel.setVisibility(View.GONE);
+                    }
+
                     rvReviewsListing.setAdapter(new ReviewsAdapter(getApplicationContext(), reviews, new ReviewsAdapter.OnItemClickListener() {
 
                         @Override
@@ -169,12 +213,19 @@ public class DetailActivity extends AppCompatActivity {
 
                     List<Trailer> trailer = response.body().getResults();
 
-                    for (Trailer trailer1 : trailer) {
-
-//                        Toast.makeText(DetailActivity.this, trailer1.getKey() + " " + trailer1.getSite(), Toast.LENGTH_SHORT).show();
-                        Timber.d(trailer1.getKey() + " " + trailer1.getSite());
-
+                    if (trailer.size() < 1) {
+                        tvTrailerLabel.setVisibility(View.GONE);
                     }
+
+                    rvTrailerListing.setAdapter(new TrailersAdapter(getApplicationContext(), trailer, new TrailersAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(Trailer trailer) {
+
+//                            Toast.makeText(DetailActivity.this, trailer.getKey(), Toast.LENGTH_SHORT).show();
+                            watchYoutubeVideoTrailer(trailer.getKey());
+
+                        }
+                    }));
 
                 } catch (NullPointerException e) {
 
