@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public static final String POPULAR_CALL_TAG = "popular";
     public static final String TOPRATED_CALL_TAG = "toprated";
+    public static final int FAVORITE_MOVIES_LIST = 2;
 
     private MoviesAdapter moviesAdapter;
     private List<MovieDetail> movieList;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinnerMoviePicker.setOnItemSelectedListener(this);
         spinnerMoviePicker.setAdapter(spinnerAdapter);
 
-        swapToggleRetrievedList();
+        swapToggleRetrievedList(0);
 
     }
 
@@ -111,37 +112,41 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void swapToggleRetrievedList() {
-        try {
+    public void swapToggleRetrievedList(int selected) {
 
-            MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
+        if (selected == FAVORITE_MOVIES_LIST) {
 
-            Call<MovieResponse> call;
-            if (popular) {
-                call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
-            } else {
-                call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
-            }
+        } else {
+            try {
 
-            call.enqueue(new Callback<MovieResponse>() {
-                @Override
-                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
+
+                Call<MovieResponse> call;
+                if (popular) {
+                    call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
+                } else {
+                    call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
+                }
+
+                call.enqueue(new Callback<MovieResponse>() {
+                    @Override
+                    public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
 
 //                    Timber.i("Response successful");
 //                    Timber.i(response.body().getPage().toString());
 
 //                    MovieResponse movieResponse = response.body();
-                    try {
-                        List<MovieDetail> movies = response.body().getMovieDetails();
-                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies, new MoviesAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(MovieDetail movie) {
+                        try {
+                            List<MovieDetail> movies = response.body().getMovieDetails();
+                            recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies, new MoviesAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(MovieDetail movie) {
 
 //                                Toast.makeText(MainActivity.this, "From swap toggle " + movie.getOriginalTitle(), Toast.LENGTH_SHORT).show();
-                                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                                    Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
 
-                                // This is where the parcelable is being passed
-                                detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+                                    // This is where the parcelable is being passed
+                                    detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
 
 //                                Bundle detailBundle = new Bundle();
 //                                detailBundle.putString(MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
@@ -151,24 +156,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                                detailBundle.putString(MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
 //                                detailBundle.putString(MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
 //                                detailIntent.putExtras(detailBundle);
-                                startActivity(detailIntent);
+                                    startActivity(detailIntent);
 
-                            }
-                        }));
+                                }
+                            }));
 //                    moviesAdapter.notifyDataSetChanged();
-                    } catch (NullPointerException e) {
-                        Timber.i(e);
+                        } catch (NullPointerException e) {
+                            Timber.i(e);
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<MovieResponse> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, "Failed to retrieve data.", Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<MovieResponse> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "Failed to retrieve data.", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-        } catch (Exception e) {
-            Timber.i(e);
+            } catch (Exception e) {
+                Timber.i(e);
+            }
         }
     }
 
@@ -180,21 +186,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case 0:
 
                 popular = true;
-                swapToggleRetrievedList();
+                swapToggleRetrievedList(i);
 
                 break;
 
             case 1:
 
                 popular = false;
-                swapToggleRetrievedList();
+                swapToggleRetrievedList(i);
 
                 break;
+                
+            case 2:
+
+                swapToggleRetrievedList(FAVORITE_MOVIES_LIST);
+                // TODO add the new favorite section into the recyclerview swaptoggle
+                Toast.makeText(this, "Favorite List", Toast.LENGTH_SHORT).show();
 
             default:
 
                 popular = true;
-                swapToggleRetrievedList();
+                swapToggleRetrievedList(0);
 
                 break;
 

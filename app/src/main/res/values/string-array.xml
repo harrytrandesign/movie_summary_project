@@ -3,5 +3,6 @@
     <string-array name="movie_selection">
         <item>@string/spinner_label_popular</item>
         <item>@string/spinner_label_toprated</item>
+        <item>@string/spinner_label_favorite</item>
     </string-array>
 </resources>
