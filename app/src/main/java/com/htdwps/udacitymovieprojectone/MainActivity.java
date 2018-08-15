@@ -11,8 +11,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.htdwps.udacitymovieprojectone.adapter.FavoriteAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
+import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.MovieResponse;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
@@ -34,12 +36,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private RecyclerView recyclerView;
     private Spinner spinnerMoviePicker;
 
-    public static final String POPULAR_CALL_TAG = "popular";
-    public static final String TOPRATED_CALL_TAG = "toprated";
+    public static final int POPULAR_CALL_TAG = 0;
+    public static final int TOPRATED_CALL_TAG = 1;
     public static final int FAVORITE_MOVIES_LIST = 2;
+
+    private AppFavoriteDatabase mDatabase;
 
     private MoviesAdapter moviesAdapter;
     private List<MovieDetail> movieList;
+    private FavoriteAdapter favoriteAdapter;
 
     // Menu for swapping between popular and top rated
     private ArrayAdapter<String> spinnerAdapter;
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         swapToggleRetrievedList(0);
 
+        mDatabase = AppFavoriteDatabase.getInstance(getApplicationContext());
+
     }
 
     public void setupLayout() {
@@ -116,13 +123,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (selected == FAVORITE_MOVIES_LIST) {
 
+            List<MovieDetail> favorites = mDatabase.movieFavoriteDao().loadFavorites();
+
+            recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), favorites, new MoviesAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(MovieDetail movie) {
+
+                    Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                    detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+                    startActivity(detailIntent);
+
+                }
+            }));
+//            favoriteAdapter = new FavoriteAdapter(this, favorites, new FavoriteAdapter.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(FavoriteMovie movie) {
+//
+////                    Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+////                    detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+////                    startActivity(detailIntent);
+//
+//                }
+//            });
+
         } else {
+
             try {
 
                 MovieApiService movieApiService = RetrofitClientManager.getClient().create(MovieApiService.class);
 
                 Call<MovieResponse> call;
-                if (popular) {
+                if (selected == POPULAR_CALL_TAG) {
                     call = movieApiService.getPopularMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
                 } else {
                     call = movieApiService.getTopRatedMovies(BuildConfig.MOVIE_DB_API_KEY_TOKEN);
@@ -199,9 +230,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 
             case 2:
 
-                swapToggleRetrievedList(FAVORITE_MOVIES_LIST);
+                swapToggleRetrievedList(i);
                 // TODO add the new favorite section into the recyclerview swaptoggle
                 Toast.makeText(this, "Favorite List", Toast.LENGTH_SHORT).show();
+
+                break;
 
             default:
 
@@ -216,6 +249,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        swapToggleRetrievedList(spinnerMoviePicker.getSelectedItemPosition());
 
     }
 }

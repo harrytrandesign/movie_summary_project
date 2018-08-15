@@ -15,6 +15,8 @@ import com.squareup.picasso.Picasso;
  */
 public class MovieViewHolder extends RecyclerView.ViewHolder {
 
+    public static final String IMAGE_PATH_PREFIX = "http://image.tmdb.org/t/p/w500";
+
     private ImageView posterImageView;
 
     public MovieViewHolder(View itemView) {
@@ -36,7 +38,7 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
     public void bind(final Context context, final MovieDetail movie, final MoviesAdapter.OnItemClickListener listener) {
 
         Picasso.with(context)
-                .load(movie.getPosterPath())
+                .load(IMAGE_PATH_PREFIX + movie.getPosterPath())
                 .placeholder(R.color.colorPrimary)
                 .into(posterImageView);
 

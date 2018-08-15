@@ -10,14 +10,18 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
 import com.htdwps.udacitymovieprojectone.adapter.ReviewsAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.TrailersAdapter;
+import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
 import com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.ReviewList;
@@ -26,6 +30,7 @@ import com.htdwps.udacitymovieprojectone.model.Trailer;
 import com.htdwps.udacitymovieprojectone.model.TrailerList;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
 import com.htdwps.udacitymovieprojectone.util.StringConstantsUtil;
+import com.htdwps.udacitymovieprojectone.viewholder.MovieViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -37,7 +42,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ReviewsAdapter reviewsAdapter;
     private List<Reviews> reviewsList;
@@ -54,7 +59,15 @@ public class DetailActivity extends AppCompatActivity {
     private RecyclerView rvTrailerListing;
     private TextView tvTrailerLabel;
 
+    private AppFavoriteDatabase mDatabase;
+
+    boolean alreadyFavorite;
+    Button favoriteMovieToggleButton;
+    int movieKeyInt;
+    Double movieVoteAvgDbl;
     String moviePosterString, movieTitleString, movieReleaseDateString, movieVoteAverageString, movieSynopsisString, movieIdKey;
+
+    MovieDetail exists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +79,9 @@ public class DetailActivity extends AppCompatActivity {
         Timber.plant();
         ButterKnife.bind(this);
 
+        // Create new database or load database
+        mDatabase = AppFavoriteDatabase.getInstance(getApplicationContext());
+
         reviewsList = new ArrayList<>();
         reviewsAdapter = new ReviewsAdapter(this, reviewsList, new ReviewsAdapter.OnItemClickListener() {
             @Override
@@ -75,6 +91,7 @@ public class DetailActivity extends AppCompatActivity {
         });
 
 //        ivTwoThirdsImageView = findViewById(R.id.iv_two_third_image_poster);
+        favoriteMovieToggleButton = findViewById(R.id.favorite_unfavorite_movie_button);
         ivMoviePoster = findViewById(R.id.iv_movie_poster);
         tvMovieTitle = findViewById(R.id.tv_movie_title);
         tvMovieReleaseDate = findViewById(R.id.tv_movie_release_date);
@@ -96,6 +113,70 @@ public class DetailActivity extends AppCompatActivity {
 
 
         grabBundledExtras();
+
+        queryDatabaseIfAlreadyFavorite(movieKeyInt);
+
+        favoriteMovieToggleButton.setOnClickListener(this);
+
+    }
+
+    public void queryDatabaseIfAlreadyFavorite(int id) {
+
+        exists = mDatabase.movieFavoriteDao().loadMovieAlreadyFavorite(id);
+
+        if (exists != null) {
+            alreadyFavorite = true;
+        } else {
+            alreadyFavorite = false;
+        }
+
+        toggleFavoriteButton(alreadyFavorite);
+
+    }
+
+    public void toggleFavoriteButton(boolean favorited) {
+
+        String label;
+
+        if (favorited) {
+            label = getResources().getString(R.string.unfavorite_button_label);
+        } else {
+            label = getResources().getString(R.string.favorite_button_label);
+        }
+
+        favoriteMovieToggleButton.setText(label);
+
+    }
+
+    public void saveToFavorites() {
+        int movie_id = movieKeyInt;
+        String title = movieTitleString;
+        String image = moviePosterString;
+        String summary = movieSynopsisString;
+        String release = movieReleaseDateString;
+        Double voteAvg = movieVoteAvgDbl;
+//
+//        FavoriteMovie favoriteMovie = new FavoriteMovie(movie_id, title, image, summary, release);
+//
+        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
+
+//        Log.i("image", moviePosterString);
+
+        mDatabase.movieFavoriteDao().insertFavoriteMovie(movieDetail);
+
+        Toast.makeText(this, title + " added to the Dao", Toast.LENGTH_SHORT).show();
+
+        toggleFavoriteButton(true);
+
+
+    }
+
+    private void removeFavorite() {
+//        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
+
+        mDatabase.movieFavoriteDao().deleteFavoriteMovie(exists);
+
+        toggleFavoriteButton(false);
 
     }
 
@@ -132,12 +213,17 @@ public class DetailActivity extends AppCompatActivity {
 
             MovieDetail movieMovieDetail = getIntent().getParcelableExtra(StringConstantsUtil.MOVIE_OBJECT_KEY);
 
-            movieIdKey = String.valueOf(movieMovieDetail.getId());
+            movieKeyInt = movieMovieDetail.getId();
+            movieVoteAvgDbl = movieMovieDetail.getVoteAverage();
+
+            movieIdKey = String.valueOf(movieKeyInt);
             moviePosterString = movieMovieDetail.getPosterPath();
             movieTitleString = movieMovieDetail.getOriginalTitle();
             movieReleaseDateString = movieMovieDetail.getReleaseDate();
-            movieVoteAverageString = String.valueOf(movieMovieDetail.getVoteAverage());
+            movieVoteAverageString = String.valueOf(movieVoteAvgDbl);
             movieSynopsisString = movieMovieDetail.getOverview();
+
+            Log.i("image", "Poster Path is " + moviePosterString);
 
             populateUiFields(moviePosterString, movieTitleString, movieReleaseDateString, movieVoteAverageString, movieSynopsisString);
 
@@ -254,7 +340,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Used placeholder and error methods per suggestion from review
         Picasso.with(this)
-                .load(poster)
+                .load(MovieViewHolder.IMAGE_PATH_PREFIX + poster)
                 .placeholder(R.drawable.allblackhorizontal)
                 .error(R.drawable.allblackhorizontal)
                 .into(ivMoviePoster);
@@ -298,6 +384,24 @@ public class DetailActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        int id = view.getId();
+
+        switch (id) {
+
+            case R.id.favorite_unfavorite_movie_button:
+
+                if (!alreadyFavorite) {
+                    saveToFavorites();
+                } else {
+                    removeFavorite();
+                }
+
+        }
     }
 
 }

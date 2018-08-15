@@ -42,6 +42,14 @@
 
         </FrameLayout>
 
+        <Button
+            android:id="@+id/favorite_unfavorite_movie_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:text="@string/favorite_button_label"
+            android:textColor="@color/white"/>
+
         <!-- Just for testing and practice purposes -->
         <!--<com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView-->
         <!--android:id="@+id/iv_two_third_image_poster"-->

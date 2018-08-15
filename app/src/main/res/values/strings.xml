@@ -11,4 +11,7 @@
     <string name="btn_text_click_me">Watch</string>
     <string name="reviews_label_textview">Reviews</string>
     <string name="trailer_label_textview">Trailers</string>
+
+    <string name="favorite_button_label">Favorite</string>
+    <string name="unfavorite_button_label">Unfavorite</string>
 </resources>
