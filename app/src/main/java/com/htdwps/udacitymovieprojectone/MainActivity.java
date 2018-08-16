@@ -1,10 +1,14 @@
 package com.htdwps.udacitymovieprojectone;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -123,18 +127,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (selected == FAVORITE_MOVIES_LIST) {
 
-            List<MovieDetail> favorites = mDatabase.movieFavoriteDao().loadFavorites();
-
-            recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), favorites, new MoviesAdapter.OnItemClickListener() {
+            LiveData<List<MovieDetail>> favorites = mDatabase.movieFavoriteDao().loadFavorites();
+            favorites.observe(this, new Observer<List<MovieDetail>>() {
                 @Override
-                public void onItemClick(MovieDetail movie) {
+                public void onChanged(@Nullable List<MovieDetail> movieDetails) {
 
-                    Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
-                    detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
-                    startActivity(detailIntent);
+                    Log.i("image", "Receiving database update from LiveData.");
+                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movieDetails, new MoviesAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(MovieDetail movie) {
+
+                            Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                            detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+                            startActivity(detailIntent);
+
+                        }
+                    }));
 
                 }
-            }));
+            });
+
 //            favoriteAdapter = new FavoriteAdapter(this, favorites, new FavoriteAdapter.OnItemClickListener() {
 //                @Override
 //                public void onItemClick(FavoriteMovie movie) {

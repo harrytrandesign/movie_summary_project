@@ -1,5 +1,6 @@
 package com.htdwps.udacitymovieprojectone.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -22,7 +23,7 @@ public interface MovieFavoriteDao {
     List<FavoriteMovie> loadFavoriteMovies();
 
     @Query("SELECT * FROM favorites_movies_list ORDER BY title")
-    List<MovieDetail> loadFavorites();
+    LiveData<List<MovieDetail>> loadFavorites();
 
     // Load based on an ID
     @Query("SELECT * FROM favorites_movies_list WHERE id = :movieKey LIMIT 1")

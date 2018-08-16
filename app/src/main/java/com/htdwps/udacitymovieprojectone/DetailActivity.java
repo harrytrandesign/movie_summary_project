@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
 import com.htdwps.udacitymovieprojectone.adapter.ReviewsAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.TrailersAdapter;
+import com.htdwps.udacitymovieprojectone.database.AppExecutors;
 import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
 import com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
@@ -111,7 +112,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //        rvReviewsListing.setAdapter(reviewsAdapter);
         rvReviewsListing.addItemDecoration(new DividerItemDecoration(rvReviewsListing.getContext(), DividerItemDecoration.VERTICAL));
 
-
         grabBundledExtras();
 
         queryDatabaseIfAlreadyFavorite(movieKeyInt);
@@ -120,17 +120,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void queryDatabaseIfAlreadyFavorite(int id) {
+    public void queryDatabaseIfAlreadyFavorite(final int id) {
 
-        exists = mDatabase.movieFavoriteDao().loadMovieAlreadyFavorite(id);
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
 
-        if (exists != null) {
-            alreadyFavorite = true;
-        } else {
-            alreadyFavorite = false;
-        }
+                exists = mDatabase.movieFavoriteDao().loadMovieAlreadyFavorite(id);
 
-        toggleFavoriteButton(alreadyFavorite);
+                if (exists != null) {
+                    alreadyFavorite = true;
+                    tvMovieTitle.setText(exists.getTitle());
+                } else {
+                    alreadyFavorite = false;
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        toggleFavoriteButton(alreadyFavorite);
+
+                    }
+                });
+            }
+        });
 
     }
 
@@ -149,8 +163,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void saveToFavorites() {
-        int movie_id = movieKeyInt;
-        String title = movieTitleString;
+        final int movie_id = movieKeyInt;
+        final String title = movieTitleString;
         String image = moviePosterString;
         String summary = movieSynopsisString;
         String release = movieReleaseDateString;
@@ -158,30 +172,58 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //
 //        FavoriteMovie favoriteMovie = new FavoriteMovie(movie_id, title, image, summary, release);
 //
-        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
+        final MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
 
 //        Log.i("image", moviePosterString);
 
-        mDatabase.movieFavoriteDao().insertFavoriteMovie(movieDetail);
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
 
-        Toast.makeText(this, title + " " + getString(R.string.favorite_added_string), Toast.LENGTH_SHORT).show();
+                mDatabase.movieFavoriteDao().insertFavoriteMovie(movieDetail);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        queryDatabaseIfAlreadyFavorite(movie_id);
+                        Toast.makeText(getApplicationContext(), getString(R.string.favorite_added_string), Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+            }
+        });
+
 
 //        toggleFavoriteButton(true);
-        queryDatabaseIfAlreadyFavorite(movie_id);
 
     }
 
     private void removeFavorite() {
 //        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
 
-        int id = exists.getId();
-        String title = exists.getTitle();
+        final int id = exists.getId();
+        final String title = exists.getTitle();
 
-        mDatabase.movieFavoriteDao().deleteFavoriteMovie(exists);
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
 
-        Toast.makeText(this, title + " " + getString(R.string.favorite_removed_string), Toast.LENGTH_SHORT).show();
+                mDatabase.movieFavoriteDao().deleteFavoriteMovie(exists);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        queryDatabaseIfAlreadyFavorite(id);
+                        Toast.makeText(getApplicationContext(), getString(R.string.favorite_removed_string), Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+            }
+        });
+
 //        toggleFavoriteButton(false);
-        queryDatabaseIfAlreadyFavorite(id);
 
     }
 
