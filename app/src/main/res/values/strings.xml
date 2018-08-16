@@ -14,4 +14,6 @@
 
     <string name="favorite_button_label">Favorite</string>
     <string name="unfavorite_button_label">Unfavorite</string>
+    <string name="favorite_added_string">has been added to the your favorites list</string>
+    <string name="favorite_removed_string">has been removed from your favorites list</string>
 </resources>

@@ -32,9 +32,8 @@ public abstract class AppFavoriteDatabase extends RoomDatabase {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         AppFavoriteDatabase.class,
                         AppFavoriteDatabase.DATABASE_NAME)
-                        //TODO Remove this during the live project
-                        //FIXME Blank
-                        .allowMainThreadQueries()
+                        //Remove this during the live project
+//                        .allowMainThreadQueries()
                         .build();
 
             }

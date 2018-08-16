@@ -24,6 +24,7 @@ public interface MovieFavoriteDao {
     @Query("SELECT * FROM favorites_movies_list ORDER BY title")
     List<MovieDetail> loadFavorites();
 
+    // Load based on an ID
     @Query("SELECT * FROM favorites_movies_list WHERE id = :movieKey LIMIT 1")
     MovieDetail loadMovieAlreadyFavorite(int movieKey);
 

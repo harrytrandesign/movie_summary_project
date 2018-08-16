@@ -164,19 +164,24 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         mDatabase.movieFavoriteDao().insertFavoriteMovie(movieDetail);
 
-        Toast.makeText(this, title + " added to the Dao", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, title + " " + getString(R.string.favorite_added_string), Toast.LENGTH_SHORT).show();
 
-        toggleFavoriteButton(true);
-
+//        toggleFavoriteButton(true);
+        queryDatabaseIfAlreadyFavorite(movie_id);
 
     }
 
     private void removeFavorite() {
 //        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
 
+        int id = exists.getId();
+        String title = exists.getTitle();
+
         mDatabase.movieFavoriteDao().deleteFavoriteMovie(exists);
 
-        toggleFavoriteButton(false);
+        Toast.makeText(this, title + " " + getString(R.string.favorite_removed_string), Toast.LENGTH_SHORT).show();
+//        toggleFavoriteButton(false);
+        queryDatabaseIfAlreadyFavorite(id);
 
     }
 
