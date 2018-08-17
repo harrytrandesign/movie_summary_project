@@ -23,7 +23,6 @@ import com.htdwps.udacitymovieprojectone.adapter.ReviewsAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.TrailersAdapter;
 import com.htdwps.udacitymovieprojectone.database.AppExecutors;
 import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
-import com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.ReviewList;
 import com.htdwps.udacitymovieprojectone.model.Reviews;
@@ -49,7 +48,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private List<Reviews> reviewsList;
 
     // Test a 2/3 ratio imageview
-    private TwoThirdsImageView ivTwoThirdsImageView;
+//    private TwoThirdsImageView ivTwoThirdsImageView;
     private ImageView ivMoviePoster;
     private TextView tvMovieTitle;
     private TextView tvMovieReleaseDate;

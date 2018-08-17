@@ -1,7 +1,5 @@
 package com.htdwps.udacitymovieprojectone.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -10,12 +8,12 @@ import android.support.annotation.NonNull;
  * Created by HTDWPS on 8/13/18.
  */
 
-@Entity(tableName = "favorite_movie")
+//@Entity(tableName = "favorite_movie")
 public class FavoriteMovie implements Parcelable {
 
     public static final String IMAGE_PATH_PREFIX = "http://image.tmdb.org/t/p/w500";
 
-    @PrimaryKey(autoGenerate = false)
+//    @PrimaryKey(autoGenerate = false)
     private Integer id;
     private String title;
     private String posterPath;
