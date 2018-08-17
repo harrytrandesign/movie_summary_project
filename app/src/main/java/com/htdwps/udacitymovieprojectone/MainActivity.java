@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case 2:
 
                 swapToggleRetrievedList(i);
-                // TODO add the new favorite section into the recyclerview swaptoggle
                 Toast.makeText(this, "Favorite List", Toast.LENGTH_SHORT).show();
 
                 break;

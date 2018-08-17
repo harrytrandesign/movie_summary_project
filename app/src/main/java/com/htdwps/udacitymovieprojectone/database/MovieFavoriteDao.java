@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by HTDWPS on 8/13/18.
  */
+
 @Dao
 public interface MovieFavoriteDao {
 
