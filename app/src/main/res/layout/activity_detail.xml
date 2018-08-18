@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,7 +37,7 @@
                 android:fontFamily="sans-serif-black"
                 android:padding="@dimen/padding_small"
                 android:textColor="@color/white"
-                android:textSize="24sp"/>
+                android:textSize="@dimen/large_font"/>
 
         </FrameLayout>
 
@@ -49,13 +48,6 @@
             android:background="@color/colorAccent"
             android:text="@string/favorite_button_label"
             android:textColor="@color/white"/>
-
-        <!-- Just for testing and practice purposes -->
-        <!--<com.htdwps.udacitymovieprojectone.ignore.TwoThirdsImageView-->
-        <!--android:id="@+id/iv_two_third_image_poster"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:scaleType="centerCrop"/>-->
 
         <TextView
             android:id="@+id/tv_movie_release_date"

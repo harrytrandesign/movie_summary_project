@@ -16,4 +16,5 @@
     <string name="unfavorite_button_label">Unfavorite</string>
     <string name="favorite_added_string">This movie has been added to the your favorites list</string>
     <string name="favorite_removed_string">This movie has been removed from your favorites list</string>
+    <string name="thumbnail_content_description">Movie thumbnail image</string>
 </resources>
