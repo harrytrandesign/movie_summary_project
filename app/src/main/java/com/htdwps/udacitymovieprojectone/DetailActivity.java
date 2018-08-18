@@ -168,9 +168,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         String summary = movieSynopsisString;
         String release = movieReleaseDateString;
         Double voteAvg = movieVoteAvgDbl;
-//
-//        FavoriteMovie favoriteMovie = new FavoriteMovie(movie_id, title, image, summary, release);
-//
+
         final MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
 
 //        Log.i("image", moviePosterString);
@@ -199,7 +197,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void removeFavorite() {
-//        MovieDetail movieDetail = new MovieDetail(movie_id, voteAvg, title, moviePosterString, summary, release);
 
         final int id = exists.getId();
         final String title = exists.getTitle();
@@ -247,15 +244,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     public void grabBundledExtras() {
         if (getIntent().getExtras() != null) {
-
-//            Bundle bundle = getIntent().getExtras();
-//
-//            movieIdKey = bundle.getString(MOVIE_ID_STRING_KEY);
-//            moviePosterString = bundle.getString(MOVIE_POSTER_STRING_KEY);
-//            movieTitleString = bundle.getString(MOVIE_TITLE_STRING_KEY);
-//            movieReleaseDateString = bundle.getString(MOVIE_RELEASE_STRING_KEY);
-//            movieVoteAverageString = bundle.getString(MOVIE_VOTE_STRING_KEY);
-//            movieSynopsisString = bundle.getString(MOVIE_SUMMARY_STRING_KEY);
 
             MovieDetail movieMovieDetail = getIntent().getParcelableExtra(StringConstantsUtil.MOVIE_OBJECT_KEY);
 
@@ -307,13 +295,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 //                            Toast.makeText(DetailActivity.this, reviews.getId(), Toast.LENGTH_SHORT).show();
                         }
                     }));
-
-//                    for (Reviews reviews1 : reviews) {
-//
-//                        Toast.makeText(DetailActivity.this, reviews1.getContent(), Toast.LENGTH_SHORT).show();
-//                        Timber.d(reviews1.getAuthor() + " " + reviews1.getContent());
-//
-//                    }
 
                 } catch (NullPointerException e) {
 
@@ -415,9 +396,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             tvMovieSynopsis.setText(summary);
         }
-
-        // This toast pops up when detail activity opens up
-//        Toast.makeText(this, movieSynopsisString, Toast.LENGTH_LONG).show();
 
     }
 

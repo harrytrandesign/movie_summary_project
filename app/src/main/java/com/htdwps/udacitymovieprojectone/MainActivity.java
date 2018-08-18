@@ -22,6 +22,7 @@ import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.MovieResponse;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
+import com.htdwps.udacitymovieprojectone.util.ThumbnailResizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner spinnerMoviePicker;
 
     public static final int POPULAR_CALL_TAG = 0;
-    public static final int TOPRATED_CALL_TAG = 1;
+    public static final int TOP_RATED_CALL_TAG = 1;
     public static final int FAVORITE_MOVIES_LIST = 2;
 
     private AppFavoriteDatabase mDatabase;
@@ -68,37 +69,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Timber.plant();
         ButterKnife.bind(this);
 
-//        setupLayout();
         movieList = new ArrayList<>();
         moviesAdapter = new MoviesAdapter(this, movieList, new MoviesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(MovieDetail movie) {
 
-                // I don't think this method is called at all when an item is clicked on the grid view
-//                Toast.makeText(MainActivity.this, movie.getId().toString(), Toast.LENGTH_SHORT).show();
-
-//                Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
-//
-//                // Test using Parcelable to pass object from one activity to another
-//                MovieDetail result = movie;
-//
-//                detailIntent.putExtra(MOVIE_OBJECT_KEY, result);
-//                Bundle detailBundle = new Bundle();
-//
-//                detailBundle.putString(DetailActivity.MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
-//                detailBundle.putString(DetailActivity.MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
-//                detailBundle.putString(DetailActivity.MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
-//                detailBundle.putString(DetailActivity.MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
-//                detailBundle.putString(DetailActivity.MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
-//                detailBundle.putString(DetailActivity.MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
-//                detailIntent.putExtras(detailBundle);
-
-//                startActivity(detailIntent);
-
             }
         });
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, ThumbnailResizer.calculateNoOfColumns(this));
         recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.hasFixedSize();
@@ -110,16 +89,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinnerMoviePicker.setOnItemSelectedListener(this);
         spinnerMoviePicker.setAdapter(spinnerAdapter);
 
-        swapToggleRetrievedList(0);
-
         mDatabase = AppFavoriteDatabase.getInstance(getApplicationContext());
-
-    }
-
-    public void setupLayout() {
-//        spinnerMoviePicker = findViewById(R.id.spinner_toggle_select);
-//        recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
-
 
     }
 
@@ -147,17 +117,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             });
 
-//            favoriteAdapter = new FavoriteAdapter(this, favorites, new FavoriteAdapter.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(FavoriteMovie movie) {
-//
-////                    Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
-////                    detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
-////                    startActivity(detailIntent);
-//
-//                }
-//            });
-
         } else {
 
             try {
@@ -175,10 +134,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     @Override
                     public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
 
-//                    Timber.i("Response successful");
-//                    Timber.i(response.body().getPage().toString());
-
-//                    MovieResponse movieResponse = response.body();
                         try {
                             List<MovieDetail> movies = response.body().getMovieDetails();
                             recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies, new MoviesAdapter.OnItemClickListener() {
@@ -191,19 +146,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     // This is where the parcelable is being passed
                                     detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
 
-//                                Bundle detailBundle = new Bundle();
-//                                detailBundle.putString(MOVIE_ID_STRING_KEY, String.valueOf(movie.getId()));
-//                                detailBundle.putString(MOVIE_POSTER_STRING_KEY, movie.getPosterPath());
-//                                detailBundle.putString(MOVIE_TITLE_STRING_KEY, movie.getOriginalTitle());
-//                                detailBundle.putString(MOVIE_RELEASE_STRING_KEY, movie.getReleaseDate());
-//                                detailBundle.putString(MOVIE_VOTE_STRING_KEY, String.valueOf(movie.getVoteAverage()));
-//                                detailBundle.putString(MOVIE_SUMMARY_STRING_KEY, movie.getOverview());
-//                                detailIntent.putExtras(detailBundle);
                                     startActivity(detailIntent);
 
                                 }
                             }));
-//                    moviesAdapter.notifyDataSetChanged();
+
                         } catch (NullPointerException e) {
                             Timber.i(e);
                         }
@@ -225,36 +172,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-        switch (i) {
-            case 0:
+        int number;
 
-                popular = true;
-                swapToggleRetrievedList(i);
+        number = spinnerMoviePicker.getSelectedItemPosition();
 
-                break;
+//        Toast.makeText(this, "" + number, Toast.LENGTH_SHORT).show();
 
-            case 1:
+        swapToggleRetrievedList(number);
 
-                popular = false;
-                swapToggleRetrievedList(i);
-
-                break;
-                
-            case 2:
-
-                swapToggleRetrievedList(i);
-                Toast.makeText(this, "Favorite List", Toast.LENGTH_SHORT).show();
-
-                break;
-
-            default:
-
-                popular = true;
-                swapToggleRetrievedList(0);
-
-                break;
-
-        }
+//        switch (i) {
+//            case POPULAR_CALL_TAG:
+//
+//                popular = true;
+//                swapToggleRetrievedList(i);
+//
+//                break;
+//
+//            case TOP_RATED_CALL_TAG:
+//
+//                popular = false;
+//                swapToggleRetrievedList(i);
+//
+//                break;
+//
+//            case FAVORITE_MOVIES_LIST:
+//
+//                swapToggleRetrievedList(i);
+//                Toast.makeText(this, "Favorite List", Toast.LENGTH_SHORT).show();
+//
+//                break;
+//
+//            default:
+//
+//                popular = true;
+//                swapToggleRetrievedList(POPULAR_CALL_TAG);
+//
+//                break;
+//
+//        }
 
     }
 
