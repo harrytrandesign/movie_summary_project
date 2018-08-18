@@ -1,9 +1,10 @@
 package com.htdwps.udacitymovieprojectone;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,6 +20,7 @@ import com.htdwps.udacitymovieprojectone.adapter.FavoriteAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.MoviesAdapter;
 import com.htdwps.udacitymovieprojectone.adapter.RetrofitClientManager;
 import com.htdwps.udacitymovieprojectone.database.AppFavoriteDatabase;
+import com.htdwps.udacitymovieprojectone.database.MainViewModel;
 import com.htdwps.udacitymovieprojectone.model.MovieDetail;
 import com.htdwps.udacitymovieprojectone.model.MovieResponse;
 import com.htdwps.udacitymovieprojectone.util.MovieApiService;
@@ -41,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private RecyclerView recyclerView;
     private Spinner spinnerMoviePicker;
 
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mBundleRecyclerViewState;
+
     public static final int POPULAR_CALL_TAG = 0;
     public static final int TOP_RATED_CALL_TAG = 1;
     public static final int FAVORITE_MOVIES_LIST = 2;
@@ -61,6 +66,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     // For Testing Purposes
     public boolean popular = true;
 
+    GridLayoutManager mLayoutManager;
+    Parcelable state;
+    Parcelable mListState;
+
+    int lastFirstVisiblePosition;
+
+    private Parcelable savedRecyclerLayoutState;
+    private GridLayoutManager mGridLayoutManager;
+    private static final String BUNDLE_RECYCLER_LAYOUT = "recycler_layout";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,9 +92,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, ThumbnailResizer.calculateNoOfColumns(this));
+        mGridLayoutManager = new GridLayoutManager(this, ThumbnailResizer.calculateNoOfColumns(this));
         recyclerView = findViewById(R.id.rv_movie_list_recyclerview);
-        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setLayoutManager(mGridLayoutManager);
         recyclerView.hasFixedSize();
         recyclerView.setAdapter(moviesAdapter);
 
@@ -97,25 +112,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (selected == FAVORITE_MOVIES_LIST) {
 
-            LiveData<List<MovieDetail>> favorites = mDatabase.movieFavoriteDao().loadFavorites();
-            favorites.observe(this, new Observer<List<MovieDetail>>() {
-                @Override
-                public void onChanged(@Nullable List<MovieDetail> movieDetails) {
-
-                    Log.i("image", "Receiving database update from LiveData.");
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movieDetails, new MoviesAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(MovieDetail movie) {
-
-                            Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
-                            detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
-                            startActivity(detailIntent);
-
-                        }
-                    }));
-
-                }
-            });
+            setupFavoriteViewModel();
 
         } else {
 
@@ -151,6 +148,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 }
                             }));
 
+                            if(savedRecyclerLayoutState != null){
+                                restoreRecyclerListPosition(savedRecyclerLayoutState);
+                            }
+
                         } catch (NullPointerException e) {
                             Timber.i(e);
                         }
@@ -166,6 +167,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Timber.i(e);
             }
         }
+    }
+
+    private void setupFavoriteViewModel() {
+
+//        LiveData<List<MovieDetail>> favorites = mDatabase.movieFavoriteDao().loadFavorites();
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getMovies().observe(this, new Observer<List<MovieDetail>>() {
+            @Override
+            public void onChanged(@Nullable List<MovieDetail> movieDetails) {
+
+                Log.i("database", "Updating list of favorite movies from LiveData.");
+                recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movieDetails, new MoviesAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(MovieDetail movie) {
+
+                        Intent detailIntent = new Intent(getBaseContext(), DetailActivity.class);
+                        detailIntent.putExtra(MOVIE_OBJECT_KEY, movie);
+                        startActivity(detailIntent);
+
+                    }
+                }));
+
+//                mLayoutManager.onRestoreInstanceState(state);
+
+                if(savedRecyclerLayoutState != null){
+                    restoreRecyclerListPosition(savedRecyclerLayoutState);
+                }
+
+            }
+        });
+    }
+
+    private void restoreRecyclerListPosition(Parcelable listPosition) {
+        mGridLayoutManager.onRestoreInstanceState(listPosition);
     }
 
 
@@ -219,10 +254,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+//        lastFirstVisiblePosition = ((GridLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+//
+//        state = mLayoutManager.onSaveInstanceState();
+
+        // save RecyclerView state
+//        mBundleRecyclerViewState = new Bundle();
+//        Parcelable listState = recyclerView.getLayoutManager().onSaveInstanceState();
+//        mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
+
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
-        swapToggleRetrievedList(spinnerMoviePicker.getSelectedItemPosition());
+//        ((GridLayoutManager) recyclerView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
+
+        // restore RecyclerView state
+//        if (mBundleRecyclerViewState != null) {
+//
+//            swapToggleRetrievedList(spinnerMoviePicker.getSelectedItemPosition());
+//
+//            Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);
+//            recyclerView.getLayoutManager().onRestoreInstanceState(listState);
+//
+//        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGridLayoutManager.onSaveInstanceState());
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        //restore recycler view at same position
+        if (savedInstanceState != null) {
+            savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+        }
 
     }
 }
